@@ -78,7 +78,7 @@ export const generarPDF = async (xmlData: string): Promise<Blob> => {
     const formData = new FormData();
     formData.append("xmlConQR", xmlData);
 
-    const response = await fetch("/generarPdfDesdeXML.php", {
+    const response = await fetch("/test-pdf-basico.php", {
       method: "POST",
       body: formData,
     });
@@ -90,6 +90,16 @@ export const generarPDF = async (xmlData: string): Promise<Blob> => {
     return await response.blob();
   } catch (error) {
     console.error("Error al generar PDF:", error);
+    throw error;
+  }
+};
+
+export const generarPDFConJsPDF = async (): Promise<void> => {
+  try {
+    const { generarPDFPrueba } = await import("../utils/pdfGenerator");
+    generarPDFPrueba();
+  } catch (error) {
+    console.error("Error al generar PDF con jsPDF:", error);
     throw error;
   }
 };

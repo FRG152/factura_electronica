@@ -155,10 +155,25 @@ export function Facturas() {
     window.URL.revokeObjectURL(url);
   };
 
+  const handleGeneratePDFTest = async () => {
+    try {
+      await generarPDFConJsPDF();
+    } catch (error) {
+      console.error("Error al generar PDF de prueba:", error);
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-tight">Facturas Emitidas</h1>
+        <Button
+          onClick={handleGeneratePDFTest}
+          className="bg-green-600 hover:bg-green-700 text-white"
+        >
+          <FileText size={16} className="mr-2" />
+          Probar PDF
+        </Button>
       </div>
 
       {error && (
