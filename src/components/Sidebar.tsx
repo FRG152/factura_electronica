@@ -5,6 +5,7 @@ import {
   FileText,
   Settings,
   PlusCircle,
+  Package,
 } from "lucide-react";
 import {
   Sidebar,
@@ -14,9 +15,10 @@ import {
   SidebarHeader,
   SidebarContent,
 } from "./ui/sidebar";
-import { useAuth } from "../contexts/AuthContext";
 import { sidebarItems } from "../constants/sidebar";
 import { Link, useLocation } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { logoutUser } from "../store/slices/authSlice";
 
 const iconMap = {
   Home,
@@ -24,11 +26,17 @@ const iconMap = {
   Users,
   Settings,
   PlusCircle,
+  Package,
 };
 
 export function SidebarComponent() {
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+  };
 
   return (
     <Sidebar>
@@ -62,11 +70,11 @@ export function SidebarComponent() {
 
       <SidebarFooter>
         <div className="sidebar_user">
-          {user?.name || user?.email || "Usuario"}
+          {user?.username || user?.email || "Usuario"}
         </div>
         <div>
           <SidebarItem
-            onClick={logout}
+            onClick={handleLogout}
             icon={<LogOut size={50} />}
             className="sidebar_btn_logout"
           >

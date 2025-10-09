@@ -1,21 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
 import { useForm } from "react-hook-form";
-
-import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Eye, EyeOff, FileText } from "lucide-react";
 
 import { loginSchema, type LoginFormData } from "../schemas/auth/login";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { loginUser, clearError } from "../store/slices/authSlice";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const { login, isLoading, error } = useAuth();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { error, isAuthenticated } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
 
   const {
     register,
@@ -24,17 +39,13 @@ export function LoginForm() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    try {
-      await login(data);
-    } catch (error) {
-      console.error("Error en login:", error);
-    }
+    dispatch(loginUser(data));
   };
 
   return (
@@ -52,22 +63,22 @@ export function LoginForm() {
           <div className="space-y-4">
             <div>
               <label
-                htmlFor="email"
+                htmlFor="username"
                 className="block text-sm font-medium text-gray-700"
               >
-                Email
+                Nombre de Usuario
               </label>
               <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                placeholder="correo@email.com"
+                id="username"
+                type="text"
+                autoComplete="username"
+                placeholder="usuario"
                 className="mt-1"
-                {...register("email")}
+                {...register("username")}
               />
-              {errors.email && (
+              {errors.username && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.email.message}
+                  {errors.username.message}
                 </p>
               )}
             </div>

@@ -15,6 +15,11 @@ export const sidebarItems: SidebarItem[] = [
     title: "Generar Factura",
     icon: "PlusCircle",
   },
+  {
+    url: "/productos",
+    title: "Productos",
+    icon: "Package",
+  },
   // {
   //   url: "/clientes",
   //   title: "Clientes",

@@ -1,10 +1,7 @@
 import { z } from "zod";
 
 export const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, "El email es requerido")
-    .email("El email debe tener un formato válido"),
+  username: z.string().min(1, "El nombre de usuario es requerido"),
   password: z
     .string()
     .min(1, "La contraseña es requerida")
@@ -14,22 +11,18 @@ export const loginSchema = z.object({
 export type LoginFormData = z.infer<typeof loginSchema>;
 
 export interface LoginResponse {
-  success: boolean;
-  message: string;
-  data?: {
-    token: string;
-    user: {
-      id: string;
-      email: string;
-      name: string;
-      role: string;
-    };
+  access_token: string;
+  user: {
+    id: number;
+    username: string;
+    email: string;
+    isActive: boolean;
   };
 }
 
 export interface User {
-  id: string;
+  id: number;
+  username: string;
   email: string;
-  name: string;
-  role: string;
+  isActive: boolean;
 }

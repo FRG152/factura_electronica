@@ -24,7 +24,6 @@ import type { DocumentoItem, ListarDocumentosParams } from "@/interfaces";
 export function Facturas() {
   const [filteredFacturas, setFilteredFacturas] = useState<Factura[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const [paginaActual, setPaginaActual] = useState(1);
   const [limitePorPagina] = useState(10);
@@ -36,7 +35,6 @@ export function Facturas() {
   const loadDocumentos = async (params: ListarDocumentosParams = {}) => {
     try {
       setLoading(true);
-      setError(null);
 
       const requestParams: ListarDocumentosParams = {
         page: params.page || paginaActual,
@@ -74,7 +72,6 @@ export function Facturas() {
       setHasPrevPage(response.paginacion.hasPrevPage);
     } catch (err) {
       console.error("Error al cargar documentos:", err);
-      setError("Error al cargar los documentos. Usando datos de ejemplo.");
     } finally {
       setLoading(false);
     }
@@ -167,20 +164,7 @@ export function Facturas() {
     <div>
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-tight">Facturas Emitidas</h1>
-        <Button
-          onClick={handleGeneratePDFTest}
-          className="bg-green-600 hover:bg-green-700 text-white"
-        >
-          <FileText size={16} className="mr-2" />
-          Probar PDF
-        </Button>
       </div>
-
-      {error && (
-        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-          <p className="text-yellow-800">{error}</p>
-        </div>
-      )}
 
       <InvoiceFilter onFilter={handleFilter} onClear={handleClear} />
 

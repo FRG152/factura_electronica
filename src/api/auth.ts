@@ -1,15 +1,15 @@
 import type { LoginFormData, LoginResponse } from "../schemas/auth/login";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL_AUTH || "/api";
 
 export const login = async (
   credentials: LoginFormData
 ): Promise<LoginResponse> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/users/login`, {
       method: "POST",
       headers: {
+        user_token: "tu_token_secreto_aqui_cambiar_en_produccion",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(credentials),
@@ -31,7 +31,7 @@ export const logout = async (): Promise<void> => {
   try {
     const token = localStorage.getItem("auth_token");
 
-    await fetch(`${API_BASE_URL}/auth/logout`, {
+    await fetch(`${API_BASE_URL}/users/logout`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -40,7 +40,6 @@ export const logout = async (): Promise<void> => {
     });
   } catch (error) {
     console.error("Error en logout:", error);
-    // No lanzamos error en logout para no bloquear al usuario
   }
 };
 
@@ -48,7 +47,7 @@ export const refreshToken = async (): Promise<LoginResponse> => {
   try {
     const token = localStorage.getItem("auth_token");
 
-    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+    const response = await fetch(`${API_BASE_URL}/users/refresh`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -73,7 +72,7 @@ export const validateToken = async (): Promise<boolean> => {
 
     if (!token) return false;
 
-    const response = await fetch(`${API_BASE_URL}/auth/validate`, {
+    const response = await fetch(`${API_BASE_URL}/users/validate`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
