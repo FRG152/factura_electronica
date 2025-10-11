@@ -69,9 +69,9 @@ export function SidebarComponent() {
       </SidebarContent>
 
       <SidebarFooter>
-        <div className="sidebar_user">
+        <SidebarItem className="sidebar_user">
           {user?.username || user?.email || "Usuario"}
-        </div>
+        </SidebarItem>
         <div>
           <SidebarItem
             onClick={handleLogout}

@@ -1,0 +1,81 @@
+{
+  "tipoDocumento": 1,
+  "establecimiento": "001",
+  "punto": "001",
+  "numero": 10,
+  "codigoSeguridadAleatorio": "960847",
+  "descripcion": "Factura electrónica",
+  "observacion": "",
+  "fecha": "2025-09-11T16:59:20",
+  "tipoEmision": 1,
+  "tipoTransaccion": 2,
+  "tipoImpuesto": 1,
+  "moneda": "PYG",
+  "condicionAnticipo": 0,
+  "condicionTipoCambio": 0,
+  "descuentoGlobal": 0,
+  "anticipoGlobal": 0,
+  "cambio": "",
+  "factura": {
+    "presencia": 1,
+    "fecha": "2025-09-11T16:59:20"
+  },
+  "cliente": {
+    "contribuyente": true,
+    "razonSocial": "Rosmary Brunaga",
+    "tipoOperacion": 1,
+    "tipoContribuyente": 2,
+    "direccion": "",
+    "numeroCasa": "0",
+    "departamento": 11,
+    "departamentoDescripcion": "ALTO PARANA",
+    "distrito": 173,
+    "distritoDescripcion": "CIUDAD DEL ESTE",
+    "ciudad": 4278,
+    "ciudadDescripcion": "CIUDAD DEL ESTE",
+    "pais": "PRY",
+    "paisDescripcion": "Paraguay",
+    "telefono": "",
+    "celular": "",
+    "email": "",
+    "codigo": "026",
+    "ruc": "4155258-0",
+    "documentoTipo": 1,
+    "documentoNumero": "4155258"
+  },
+  "usuario": {
+    "documentoTipo": 1,
+    "documentoNumero": "157264",
+    "nombre": "Juan Pérez",
+    "cargo": "Vendedor"
+  },
+  "condicion": {
+    "tipo": 1,
+    "entregas": [
+      {
+        "tipo": 1,
+        "monto": 100000,
+        "moneda": "PYG",
+        "cambio": 0
+      }
+    ]
+  },
+  "items": [
+    {
+      "codigo": "15253621",
+      "descripcion": "Servicios profesionales",
+      "observacion": "",
+      "unidadMedida": 77,
+      "cantidad": 1,
+      "precioUnitario": 100000,
+      "cambio": 0,
+      "descuento": 0,
+      "anticipo": 0,
+      "pais": "PRY",
+      "paisDescripcion": "Paraguay",
+      "ivaTipo": 1,
+      "ivaBase": 100,
+      "iva": 10
+    }
+  ]
+}

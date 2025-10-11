@@ -20,11 +20,16 @@ export const sidebarItems: SidebarItem[] = [
     title: "Productos",
     icon: "Package",
   },
-  // {
-  //   url: "/clientes",
-  //   title: "Clientes",
-  //   icon: "Users",
-  // },
+  {
+    url: "/clientes",
+    title: "Clientes",
+    icon: "Users",
+  },
+  {
+    url: "/empresas",
+    title: "Empresas",
+    icon: "Building2",
+  },
   {
     url: "/configuracion",
     title: "Configuración",

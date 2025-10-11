@@ -1,4 +1,12 @@
 import {
+  Select,
+  SelectItem,
+  SelectValue,
+  SelectContent,
+  SelectTrigger,
+} from "./ui/select";
+
+import {
   createProductoSchema,
   updateProductoSchema,
   type CreateProductoFormData,
@@ -13,15 +21,19 @@ import {
   clearProductoActual,
 } from "../store/slices/productosSlice";
 
+import { unit } from "../constants/invoice";
+
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
-import { useForm } from "react-hook-form";
-
 import { useEffect } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+
+import { mapUnidadMedida } from "../lib/utils";
+
+import { useForm, Controller } from "react-hook-form";
 
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -34,6 +46,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 export function ProductoForm() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
   const { id } = useParams<{ id: string }>();
   const isEditing = Boolean(id);
 
@@ -45,7 +58,7 @@ export function ProductoForm() {
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
+    control,
   } = useForm<CreateProductoFormData | UpdateProductoFormData>({
     resolver: zodResolver(
       isEditing ? updateProductoSchema : createProductoSchema
@@ -53,7 +66,7 @@ export function ProductoForm() {
     defaultValues: {
       nombre: "",
       descripcion: "",
-      unidad_medida: "Unidad",
+      unidad_medida: "UNI",
       iva: 19,
       precio_compra: 0,
       precio_venta1: 0,
@@ -83,7 +96,7 @@ export function ProductoForm() {
         nombre: productoActual.nombre,
         codigo_barras: productoActual.codigo_barras || "",
         descripcion: productoActual.descripcion || "",
-        unidad_medida: productoActual.unidad_medida || "Unidad",
+        unidad_medida: mapUnidadMedida(productoActual.unidad_medida),
         iva: productoActual.iva,
         precio_compra: productoActual.precio_compra,
         precio_compra_promedio: productoActual.precio_compra_promedio,
@@ -131,13 +144,6 @@ export function ProductoForm() {
     } catch (error) {
       console.error("Error al guardar producto:", error);
     }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: "COP",
-    }).format(price);
   };
 
   return (
@@ -219,10 +225,23 @@ export function ProductoForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="unidad_medida">Unidad de Medida</Label>
-                <Input
-                  id="unidad_medida"
-                  {...register("unidad_medida")}
-                  placeholder="Unidad, Kilo, Litro, etc."
+                <Controller
+                  name="unidad_medida"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Seleccionar unidad" />
+                      </SelectTrigger>
+                      <SelectContent className="w-full">
+                        {unit.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
                 {errors.unidad_medida && (
                   <p className="text-sm text-red-600">
@@ -498,7 +517,7 @@ export function ProductoForm() {
           <Button
             type="submit"
             disabled={isCreating || isUpdating || isLoading}
-            className="min-w-[120px]"
+            className="min-w-[120px] bg-blue-600 hover:bg-blue-700"
           >
             <Save className="h-4 w-4" />
             {isCreating || isUpdating ? "Guardando..." : "Guardar"}

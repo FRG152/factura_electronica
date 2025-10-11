@@ -180,14 +180,19 @@ function getUnidadMedidaCode(unidad: string): number {
 
 /**
  * Maps IVA type string to numeric code
+ * Based on API documentation:
+ * - 1 = Gravado IVA (con impuesto)
+ * - 2 = Gravado parcial (IVA reducido)
+ * - 3 = Exento
+ * - 4 = Gravado IVA (otra tasa)
  */
 function getIvaTipoCode(tipoIva: string): number {
   const ivaMap: { [key: string]: number } = {
-    exentas: 0,
-    iva5: 1,
-    iva10: 2,
+    exentas: 3,
+    iva5: 2,
+    iva10: 1,
   };
-  return ivaMap[tipoIva] || 2;
+  return ivaMap[tipoIva] || 1;
 }
 
 /**

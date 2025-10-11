@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
-  fetchClientes,
-  createCliente,
-  updateCliente,
-  deleteCliente,
-  restoreCliente,
-  searchClientes,
+  fetchEmpresas,
+  createEmpresa,
+  updateEmpresa,
+  deleteEmpresa,
+  toggleEmpresaStatus,
+  searchEmpresas,
   setSearchQuery,
   setFiltros,
-  clearClienteActual,
+  clearEmpresaActual,
   clearError,
-} from "../store/slices/clientesSlice";
-import { ClientesList } from "../components/ClientesList";
-import { ClienteForm } from "../components/ClienteForm";
+} from "../store/slices/empresasSlice";
+import { EmpresasList } from "../components/EmpresasList";
+import { EmpresaForm } from "../components/EmpresaForm";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/Input";
 import { Select } from "../components/Select";
@@ -23,14 +23,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog";
-import type { Cliente, CrearClienteDTO } from "../interfaces/clientes";
+import type { Empresa, CrearEmpresaDTO } from "../interfaces/empresas";
 import { Plus, Search, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
-export function Clientes() {
+export function Empresas() {
   const dispatch = useAppDispatch();
   const {
-    clientes,
+    empresas,
     paginacion,
     isLoading,
     isCreating,
@@ -39,14 +39,14 @@ export function Clientes() {
     error,
     searchQuery,
     filtros,
-  } = useAppSelector((state) => state.clientes);
+  } = useAppSelector((state) => state.empresas);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [clienteEditando, setClienteEditando] = useState<Cliente | null>(null);
+  const [empresaEditando, setEmpresaEditando] = useState<Empresa | null>(null);
   const [searchInput, setSearchInput] = useState(searchQuery);
 
   useEffect(() => {
-    dispatch(fetchClientes(filtros));
+    dispatch(fetchEmpresas(filtros));
   }, [dispatch]);
 
   useEffect(() => {
@@ -60,89 +60,82 @@ export function Clientes() {
 
   const handleSearch = () => {
     dispatch(setSearchQuery(searchInput));
-    dispatch(searchClientes({ ...filtros, search: searchInput }));
+    dispatch(searchEmpresas({ ...filtros, search: searchInput }));
   };
 
   const handleRefresh = () => {
     setSearchInput("");
     dispatch(setSearchQuery(""));
-    dispatch(setFiltros({ page: 1, eliminado: 0 }));
-    dispatch(fetchClientes({ page: 1, limit: filtros.limit, eliminado: 0 }));
+    dispatch(setFiltros({ page: 1, activo: 1 }));
+    dispatch(fetchEmpresas({ page: 1, limit: filtros.limit, activo: 1 }));
   };
 
-  const handleNuevoCliente = () => {
-    setClienteEditando(null);
+  const handleNuevaEmpresa = () => {
+    setEmpresaEditando(null);
     setIsFormOpen(true);
   };
 
-  const handleEditarCliente = (cliente: Cliente) => {
-    setClienteEditando(cliente);
+  const handleEditarEmpresa = (empresa: Empresa) => {
+    setEmpresaEditando(empresa);
     setIsFormOpen(true);
   };
 
   const handleCloseForm = () => {
     setIsFormOpen(false);
-    setClienteEditando(null);
-    dispatch(clearClienteActual());
+    setEmpresaEditando(null);
+    dispatch(clearEmpresaActual());
   };
 
-  const handleSubmitForm = async (data: CrearClienteDTO) => {
+  const handleSubmitForm = async (data: CrearEmpresaDTO) => {
     try {
-      if (clienteEditando) {
+      if (empresaEditando) {
         await dispatch(
-          updateCliente({
-            id: clienteEditando.id,
-            cliente: data,
+          updateEmpresa({
+            id: empresaEditando.id,
+            empresa: data,
           })
         ).unwrap();
-        toast.success("Cliente actualizado correctamente");
+        toast.success("Empresa actualizada correctamente");
       } else {
-        await dispatch(createCliente(data)).unwrap();
-        toast.success("Cliente creado correctamente");
+        await dispatch(createEmpresa(data)).unwrap();
+        toast.success("Empresa creada correctamente");
       }
       handleCloseForm();
-      dispatch(fetchClientes(filtros));
+      dispatch(fetchEmpresas(filtros));
     } catch (err) {
       // El error ya se maneja en el reducer
     }
   };
 
-  const handleEliminarCliente = async (id: number) => {
+  const handleEliminarEmpresa = async (id: number) => {
     try {
-      await dispatch(deleteCliente({ id })).unwrap();
-      toast.success("Cliente eliminado correctamente");
-      dispatch(fetchClientes(filtros));
+      await dispatch(deleteEmpresa(id)).unwrap();
+      toast.success("Empresa eliminada correctamente");
+      dispatch(fetchEmpresas(filtros));
     } catch (err) {
       // El error ya se maneja en el reducer
     }
   };
 
-  const handleRestaurarCliente = async (id: number) => {
+  const handleToggleStatus = async (id: number) => {
     try {
-      await dispatch(restoreCliente(id)).unwrap();
-      toast.success("Cliente restaurado correctamente");
-      dispatch(fetchClientes(filtros));
+      await dispatch(toggleEmpresaStatus(id)).unwrap();
+      toast.success("Estado actualizado correctamente");
+      dispatch(fetchEmpresas(filtros));
     } catch (err) {
       // El error ya se maneja en el reducer
     }
   };
 
-  const handleFiltroEliminados = (value: string) => {
-    const eliminado = value === "1" ? 1 : 0;
-    dispatch(setFiltros({ ...filtros, eliminado }));
-    dispatch(fetchClientes({ ...filtros, eliminado }));
-  };
-
-  const handleFiltroTipoPersona = (value: string) => {
-    const tipo_persona =
-      value === "todos" ? undefined : (value as "fisica" | "juridica");
-    dispatch(setFiltros({ ...filtros, tipo_persona }));
-    dispatch(fetchClientes({ ...filtros, tipo_persona }));
+  const handleFiltroActivos = (value: string) => {
+    const activo = value === "1" ? 1 : value === "0" ? 0 : undefined;
+    dispatch(setFiltros({ ...filtros, activo }));
+    dispatch(fetchEmpresas({ ...filtros, activo }));
   };
 
   const handlePageChange = (page: number) => {
     dispatch(setFiltros({ ...filtros, page }));
-    dispatch(fetchClientes({ ...filtros, page }));
+    dispatch(fetchEmpresas({ ...filtros, page }));
   };
 
   return (
@@ -150,17 +143,17 @@ export function Clientes() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Clientes</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Empresas</h1>
           <p className="text-muted-foreground mt-2">
-            Administra tu base de clientes
+            Administra las empresas del sistema
           </p>
         </div>
         <Button
-          onClick={handleNuevoCliente}
+          onClick={handleNuevaEmpresa}
           className="bg-blue-600 hover:bg-blue-700"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Nuevo Cliente
+          Nueva Empresa
         </Button>
       </div>
 
@@ -173,7 +166,7 @@ export function Clientes() {
                 label=""
                 value={searchInput}
                 onChange={setSearchInput}
-                placeholder="Buscar por nombre, CI, RUC o email..."
+                placeholder="Buscar por razón social, RUC o nombre comercial..."
                 className="flex-1"
               />
               <Button onClick={handleSearch} disabled={isLoading}>
@@ -191,24 +184,15 @@ export function Clientes() {
 
           <Select
             label=""
-            value={filtros.tipo_persona || "todos"}
+            value={
+              filtros.activo === undefined ? "todos" : filtros.activo.toString()
+            }
             options={[
-              { value: "todos", label: "Todos los tipos" },
-              { value: "fisica", label: "Persona Física" },
-              { value: "juridica", label: "Persona Jurídica" },
+              { value: "todos", label: "Todos" },
+              { value: "1", label: "Activos" },
+              { value: "0", label: "Inactivos" },
             ]}
-            onValueChange={handleFiltroTipoPersona}
-            className="w-48"
-          />
-
-          <Select
-            label=""
-            value={filtros.eliminado?.toString() || "0"}
-            options={[
-              { value: "0", label: "Activos" },
-              { value: "1", label: "Eliminados" },
-            ]}
-            onValueChange={handleFiltroEliminados}
+            onValueChange={handleFiltroActivos}
             className="w-40"
           />
         </div>
@@ -221,16 +205,15 @@ export function Clientes() {
         </div>
       )}
 
-      {/* Lista de clientes */}
+      {/* Lista de empresas */}
       {!isLoading && (
         <>
-          <ClientesList
-            clientes={clientes}
-            onEdit={handleEditarCliente}
-            onDelete={handleEliminarCliente}
-            onRestore={handleRestaurarCliente}
+          <EmpresasList
+            empresas={empresas}
+            onEdit={handleEditarEmpresa}
+            onDelete={handleEliminarEmpresa}
+            onToggleStatus={handleToggleStatus}
             isDeleting={isDeleting}
-            showEliminados={filtros.eliminado === 1}
           />
 
           {/* Paginación */}
@@ -262,14 +245,14 @@ export function Clientes() {
 
       {/* Modal de formulario */}
       <Dialog open={isFormOpen} onOpenChange={handleCloseForm}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {clienteEditando ? "Editar Cliente" : "Nuevo Cliente"}
+              {empresaEditando ? "Editar Empresa" : "Nueva Empresa"}
             </DialogTitle>
           </DialogHeader>
-          <ClienteForm
-            cliente={clienteEditando || undefined}
+          <EmpresaForm
+            empresa={empresaEditando || undefined}
             onSubmit={handleSubmitForm}
             onCancel={handleCloseForm}
             isLoading={isCreating || isUpdating}

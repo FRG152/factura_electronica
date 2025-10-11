@@ -17,6 +17,8 @@ import { paymentCondition, unit } from "@/constants/invoice";
 import { Plus, Search, Trash2, Minus, FileText } from "lucide-react";
 import type { InvoiceItem, Client, FacturaData } from "../interfaces";
 import { transformToCompleteInvoiceStructure } from "../utils/invoiceTransformer";
+import { crearDocumento } from "../api/documentos";
+import { toast } from "sonner";
 
 export function GenerarFactura() {
   const [items, setItems] = useState<InvoiceItem[]>([]);
@@ -27,6 +29,8 @@ export function GenerarFactura() {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const agregarItem = () => {
     const nuevoItem: InvoiceItem = {
@@ -67,46 +71,82 @@ export function GenerarFactura() {
       ...product,
       id: proximoId,
     };
+    console.log("Agregando producto a la factura:", nuevoItem);
     setItems([...items, nuevoItem]);
     setProximoId(proximoId + 1);
   };
 
-  const handleConfirmInvoice = () => {
-    // Crear la estructura completa de la factura
-    const completeInvoiceStructure = transformToCompleteInvoiceStructure(
-      facturaData,
-      {
-        tipoDocumento: 1,
-        establecimiento: "001",
-        punto: "001",
-        numero: 10,
-        codigoSeguridadAleatorio: Math.floor(
-          100000 + Math.random() * 900000
-        ).toString(),
-        descripcion: "Factura electrónica",
-        observacion: "",
-        fecha: new Date().toISOString(),
-        tipoEmision: 1,
-        tipoTransaccion: 2,
-        tipoImpuesto: 1,
-        moneda: "PYG",
-        condicionAnticipo: 0,
-        condicionTipoCambio: 0,
-        descuentoGlobal: 0,
-        anticipoGlobal: 0,
-        cambio: "",
+  const handleConfirmInvoice = async () => {
+    try {
+      setIsSubmitting(true);
+
+      const completeInvoiceStructure = transformToCompleteInvoiceStructure(
+        facturaData,
+        {
+          tipoDocumento: 1,
+          establecimiento: "001",
+          punto: "001",
+          numero: 10,
+          codigoSeguridadAleatorio: Math.floor(
+            100000 + Math.random() * 900000
+          ).toString(),
+          descripcion: "Factura electrónica",
+          observacion: "",
+          fecha: new Date().toISOString(),
+          tipoEmision: 1,
+          tipoTransaccion: 2,
+          tipoImpuesto: 1,
+          moneda: "PYG",
+          condicionAnticipo: 0,
+          condicionTipoCambio: 0,
+          descuentoGlobal: 0,
+          anticipoGlobal: 0,
+          cambio: "",
+        }
+      );
+
+      console.log("=== ESTRUCTURA COMPLETA DE LA FACTURA ===");
+      console.log(JSON.stringify(completeInvoiceStructure, null, 2));
+      console.log("==========================================");
+
+      // Enviar la factura a la API
+      const response = await crearDocumento(completeInvoiceStructure);
+
+      console.log("=== RESPUESTA DE LA API ===");
+      console.log(JSON.stringify(response, null, 2));
+      console.log("===========================");
+
+      if (response.success) {
+        toast.success("Factura emitida correctamente", {
+          description: `Número de documento: ${
+            response.documento?.numeroDocumento || "N/A"
+          }`,
+          duration: 5000,
+        });
+
+        // Limpiar el formulario
+        setIsConfirmModalOpen(false);
+        setCliente(null);
+        setItems([]);
+        setProximoId(1);
+      } else {
+        toast.error("Error al emitir la factura", {
+          description: response.message || "Ocurrió un error desconocido",
+          duration: 5000,
+        });
       }
-    );
-
-    console.log("=== ESTRUCTURA COMPLETA DE LA FACTURA ===");
-    console.log(JSON.stringify(completeInvoiceStructure, null, 2));
-    console.log("==========================================");
-
-    alert("Factura emitida correctamente");
-    setIsConfirmModalOpen(false);
-    setCliente(null);
-    setItems([]);
-    setProximoId(1);
+    } catch (error) {
+      console.error("Error al emitir la factura:", error);
+      toast.error("Error al emitir la factura", {
+        description:
+          error instanceof Error
+            ? error.message
+            : "Ocurrió un error al procesar la solicitud",
+        duration: 5000,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const calcularSubtotal = (tipoIva: string) => {
@@ -492,9 +532,10 @@ export function GenerarFactura() {
 
       <ConfirmInvoiceModal
         isOpen={isConfirmModalOpen}
-        onClose={() => setIsConfirmModalOpen(false)}
+        onClose={() => !isSubmitting && setIsConfirmModalOpen(false)}
         onConfirm={handleConfirmInvoice}
         facturaData={facturaData}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

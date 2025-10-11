@@ -5,18 +5,22 @@ import {
   BrowserRouter as Router,
 } from "react-router-dom";
 import { useEffect } from "react";
+import { checkAuth } from "./store/slices/authSlice";
+import { GenerarFactura } from "./pages/GenerateInvoice";
+import { useAppDispatch, useAppSelector } from "./store/hooks";
+import { Toaster } from "./components/ui/sonner";
+
+import { SidebarComponent } from "./components/Sidebar";
+
 import { Login } from "./pages/Login";
-import { Facturas } from "./pages/Invoice";
 import { Clientes } from "./pages/Clients";
+import { Empresas } from "./pages/Empresas";
+import { Facturas } from "./pages/Invoice";
+import { Productos } from "./pages/Productos";
 import { Dashboard } from "./pages/Dashboard";
 import { Configuracion } from "./pages/Configuration";
-import { SidebarComponent } from "./components/Sidebar";
-import { GenerarFactura } from "./pages/GenerateInvoice";
-import { Productos } from "./pages/Productos";
 import { CrearProducto } from "./pages/CrearProducto";
 import { EditarProducto } from "./pages/EditarProducto";
-import { useAppDispatch, useAppSelector } from "./store/hooks";
-import { checkAuth } from "./store/slices/authSlice";
 
 function AppContent() {
   const dispatch = useAppDispatch();
@@ -53,6 +57,7 @@ function AppContent() {
             <Route path="/generar_factura" element={<GenerarFactura />} />
             <Route path="/facturas" element={<Facturas />} />
             <Route path="/clientes" element={<Clientes />} />
+            <Route path="/empresas" element={<Empresas />} />
             <Route path="/productos" element={<Productos />} />
             <Route path="/productos/crear" element={<CrearProducto />} />
             <Route path="/productos/editar/:id" element={<EditarProducto />} />
@@ -69,6 +74,7 @@ function App() {
   return (
     <Router>
       <AppContent />
+      <Toaster richColors position="top-right" />
     </Router>
   );
 }

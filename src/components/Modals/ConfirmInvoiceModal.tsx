@@ -1,6 +1,6 @@
 import { Button } from "../ui/button";
 import type { FacturaData } from "../../interfaces";
-import { FileText, CheckCircle } from "lucide-react";
+import { FileText, CheckCircle, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 interface ConfirmInvoiceModalProps {
@@ -8,6 +8,7 @@ interface ConfirmInvoiceModalProps {
   onClose: () => void;
   onConfirm: () => void;
   facturaData: FacturaData;
+  isSubmitting?: boolean;
 }
 
 export function ConfirmInvoiceModal({
@@ -15,6 +16,7 @@ export function ConfirmInvoiceModal({
   onClose,
   onConfirm,
   facturaData,
+  isSubmitting = false,
 }: ConfirmInvoiceModalProps) {
   const { cliente, condicionPago, items, totales } = facturaData;
 
@@ -91,15 +93,25 @@ export function ConfirmInvoiceModal({
           </div>
 
           <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
               Cancelar
             </Button>
             <Button
               onClick={onConfirm}
               className="bg-green-600 hover:bg-green-700 text-white"
+              disabled={isSubmitting}
             >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Confirmar y Emitir
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Emitiendo...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Confirmar y Emitir
+                </>
+              )}
             </Button>
           </div>
         </div>

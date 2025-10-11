@@ -117,7 +117,7 @@ export function ProductosList() {
           <h1 className="text-2xl font-bold">Productos</h1>
         </div>
         <Link to="/productos/crear">
-          <Button>
+          <Button className="bg-blue-600 hover:bg-blue-700">
             <Plus className="h-4 w-4" />
             Nuevo Producto
           </Button>
@@ -141,7 +141,11 @@ export function ProductosList() {
               onKeyPress={handleKeyPress}
               className="flex-1"
             />
-            <Button onClick={handleSearch} disabled={isLoading}>
+            <Button
+              onClick={handleSearch}
+              disabled={isLoading}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
               <Search className="h-4 w-4" />
               Buscar
             </Button>
